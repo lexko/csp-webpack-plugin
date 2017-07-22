@@ -1,0 +1,58 @@
+
+const cheerio = require('cheerio'),
+      crypto = require('crypto'),
+      url = require('url'),
+      _ = require('lodash');
+
+/**
+ * Generate Content Security Policy from html and put it in meta tag instead of '%%CSP_CONTENT%%'.
+ * Content Security Policy prevents any untrusted javascript element from execution in browser context.
+ * Trusted js element defined by its hash or domain it originated from.
+ * Reference: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
+ */
+const CSPWebpackPlugin = function(domains) {
+  this.domains = domains;
+};
+
+CSPWebpackPlugin.prototype.apply = function(compiler) {
+  var self = this;
+
+  compiler.plugin('compilation', function(compilation) {
+    compilation.plugin('html-webpack-plugin-after-html-processing', function(htmlPluginData, callback) {
+      const $ = cheerio.load(htmlPluginData.html);
+
+      function computeHash(element) {
+        const hash = crypto
+          .createHash('sha256')
+          .update($(element).text())
+          .digest('base64');
+        return '\'sha256-' + hash + '\'';
+      }
+
+      function extractDomain(element) {
+        return url.parse($(element).attr('src')).hostname;
+      }
+
+      function buildCsp(policy) {
+        return _.flatMap(policy, (val, key) => {
+          return key + ' ' + _.flattenDeep([val]).join(' ');
+        }).join(';');
+      }
+
+      const hashes = _.flatMap($('script:not([src])'), computeHash);
+      const staticDomains = _.flatMap($('script[src]'), extractDomain);
+      const policy = {
+        'object-src': '\'none\'',
+        'base-uri': '\'self\'',
+        'script-src': ['\'unsafe-inline\'', '\'self\'', '\'unsafe-eval\'', hashes, staticDomains, self.domains],
+        'worker-src': ['\'self\'','blob:']
+      };
+
+      htmlPluginData.html = htmlPluginData.html.replace('%%CSP_CONTENT%%', buildCsp(policy));
+
+      callback(null, htmlPluginData);
+    });
+  });
+};
+
+module.exports = WebCoreContentSecurityPolicy;
