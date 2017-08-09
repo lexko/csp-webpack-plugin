@@ -10,9 +10,17 @@ const cheerio = require('cheerio'),
  * Trusted js element defined by its hash or domain it originated from.
  * Reference: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
  */
-const CSPWebpackPlugin = function(domains) {
-  this.domains = domains;
+const CSPWebpackPlugin = function(options = {}) {
+  this.policy = options
 };
+
+CSPWebpackPlugin.defaultPolicy = {
+  'object-src': '\'none\'',
+  'base-uri': '\'self\'',
+  'script-src': ['\'unsafe-inline\'', '\'self\'', '\'unsafe-eval\''],
+  'worker-src': ['\'self\'','blob:']
+};
+
 
 CSPWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
@@ -20,8 +28,8 @@ CSPWebpackPlugin.prototype.apply = function(compiler) {
   compiler.plugin('compilation', function(compilation) {
     compilation.plugin('html-webpack-plugin-after-html-processing', function(htmlPluginData, callback) {
       const $ = cheerio.load(htmlPluginData.html);
-
       function computeHash(element) {
+        console.log($(element).text())
         const hash = crypto
           .createHash('sha256')
           .update($(element).text())
@@ -41,18 +49,20 @@ CSPWebpackPlugin.prototype.apply = function(compiler) {
 
       const hashes = _.flatMap($('script:not([src])'), computeHash);
       const staticDomains = _.flatMap($('script[src]'), extractDomain);
-      const policy = {
-        'object-src': '\'none\'',
-        'base-uri': '\'self\'',
-        'script-src': ['\'unsafe-inline\'', '\'self\'', '\'unsafe-eval\'', hashes, staticDomains, self.domains],
-        'worker-src': ['\'self\'','blob:']
-      };
+      // const policy = {
+      //   'object-src': '\'none\'',
+      //   'base-uri': '\'self\'',
+      //   'script-src': ['\'unsafe-inline\'', '\'self\'', '\'unsafe-eval\'', hashes, staticDomains, self.domains],
+      //   'worker-src': ['\'self\'','blob:']
+      // };
 
-      htmlPluginData.html = htmlPluginData.html.replace('%%CSP_CONTENT%%', buildCsp(policy));
+      self.policy['script-src'] = self.policy['script-src'].concat(hashes).concat(staticDomains)
+
+      htmlPluginData.html = htmlPluginData.html.replace('%%CSP_CONTENT%%', buildCsp(self.policy));
 
       callback(null, htmlPluginData);
     });
   });
 };
 
-module.exports = WebCoreContentSecurityPolicy;
+module.exports = CSPWebpackPlugin;

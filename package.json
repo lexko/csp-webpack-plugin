@@ -5,8 +5,17 @@
   "main": "index.js",
   "author": "Alexander Minozhenko",
   "license": "Apache",
+  "scripts": {
+    "test": "jasmine"
+  },
   "dependencies": {
-    "cheerio": "^1.0.0-rc.2",
-    "lodash": "^4.17.4"
+    "cheerio": "0.22.0",
+    "lodash": "^4.17.4",
+    "webpack-csp-plugin": "^3.0.0"
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "^2.30.1",
+    "jasmine": "^2.7.0",
+    "webpack": "^3.4.1"
   }
 }
