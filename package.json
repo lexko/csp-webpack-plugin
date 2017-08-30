@@ -2,7 +2,7 @@
   "name": "csp-webpack-plugin",
   "version": "0.1.0",
   "description": "Adds Content Secutiy Policy to HTML file",
-  "main": "index.js",
+  "main": "lib/index.js",
   "author": "Alexander Minozhenko",
   "license": "Apache",
   "scripts": {
@@ -10,8 +10,7 @@
   },
   "dependencies": {
     "cheerio": "0.22.0",
-    "lodash": "^4.17.4",
-    "webpack-csp-plugin": "^3.0.0"
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "html-webpack-plugin": "^2.30.1",

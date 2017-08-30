@@ -1,7 +1,7 @@
 
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CSPWebpackPlugin = require('../index.js')
+const CSPWebpackPlugin = require('../lib/index.js')
 const fs = require('fs')
 
 describe("test webpack plugin", function(){
