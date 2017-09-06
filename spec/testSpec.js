@@ -16,7 +16,7 @@ describe("test webpack plugin", function(){
         filename: 'bundle.js'
       },
       plugins: [
-        new HtmlWebpackPlugin({template: '/Users/aminozhenko/repo/csp-webpack-plugin/spec/test.html'}),
+        new HtmlWebpackPlugin(),
         new CSPWebpackPlugin({
           'object-src': '\'none\'',
           'base-uri': '\'self\'',
@@ -26,12 +26,11 @@ describe("test webpack plugin", function(){
     };
 
     const sample = content="content=\"object-src 'none';base-uri 'self';script-src 'unsafe-inline' 'self' 'unsafe-eval' http://ajax.googleapis.com 'sha256-4axlHpxgDbFzJObpXPFZgZhULrEGgJiud3OwxN9unHg=' example.com ;worker-src 'self' blob:\""
-//    fs.writeFileSync('/tmp/dist/main.js', 'require.ensure([], function(require) { require("./chunk1.js"); });');
 
     webpack(options, function webpackCallback(err, stats) {
       const csp = stats.compilation.assets['index.html'].source().match(/content="(.*?)"/)
-      console.log(csp[0])
-      expect(csp[0]).toBe(sample)
+      console.log(csp)
+      expect(csp).toBe(sample)
       callback(err)
     })
   })
