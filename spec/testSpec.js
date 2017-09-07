@@ -7,7 +7,6 @@ const fs = require('fs')
 describe("test webpack plugin", function(){
 
   it("should generate CSP from html template", function(callback){
-    //var tmpDir = require('tmp').dirSync();
 
     const options = {
       entry: './spec/entry.js',
@@ -16,7 +15,7 @@ describe("test webpack plugin", function(){
         filename: 'bundle.js'
       },
       plugins: [
-        new HtmlWebpackPlugin(),
+        new HtmlWebpackPlugin({template: "./spec/test.html"}),
         new CSPWebpackPlugin({
           'object-src': '\'none\'',
           'base-uri': '\'self\'',
@@ -29,8 +28,7 @@ describe("test webpack plugin", function(){
 
     webpack(options, function webpackCallback(err, stats) {
       const csp = stats.compilation.assets['index.html'].source().match(/content="(.*?)"/)
-      console.log(csp)
-      expect(csp).toBe(sample)
+      expect(csp[0]).toBe(sample)
       callback(err)
     })
   })
