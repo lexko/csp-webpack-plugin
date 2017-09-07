@@ -1,6 +1,6 @@
 {
   "name": "csp-webpack-plugin",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Adds Content Secutiy Policy to HTML file",
   "main": "lib/index.js",
   "author": "Alexander Minozhenko",
