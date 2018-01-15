@@ -19,7 +19,13 @@ describe("test webpack plugin", function(){
         new CSPWebpackPlugin({
           'object-src': '\'none\'',
           'base-uri': '\'self\'',
-          'script-src': ['\'unsafe-inline\'', '\'self\'', '\'unsafe-eval\'','http://ajax.googleapis.com'],
+          'script-src': [
+            '\'unsafe-inline\'',
+            '\'self\'',
+            '\'unsafe-eval\'',
+            'http://ajax.googleapis.com',
+            'http://ajax.googleapis.com',
+          ],
           'worker-src': ['\'self\'','blob:']
         })]
     };
